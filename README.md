@@ -1,3 +1,7 @@
+The goal is to make my own kanban board, like jira.
+
+All the text below this is a super extra way to say "start the app by using 'npm start' while in the directory"
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
