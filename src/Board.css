@@ -2,12 +2,20 @@
 }
 
 .column {
+        margin-right:1%;
+        margin-left:1%;
         float: left;
+        width: 21%;
+        background-color: #82D6C9;
+        padding:1%;
+        border-radius: 5px;
+}
+.square {
         background-color: #DDDDDD;
-        width: 300px;
-        padding: 20px;
-        border: 2px solid black;
-        position: relative;
-        left: 90px;
+        padding: 10px;
+        border-radius: 25px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        font-size: 14px;
 
 }
