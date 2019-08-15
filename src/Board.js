@@ -6,21 +6,22 @@ class Board extends Component {
     constructor(props){
         super(props);
         this.state = {
-            columns: []
+            data: []
         };
+        this.moveOverTop = this.moveOverTop.bind(this);
     }
     moveOverTop(key) {
-        console.log("Move "+ key + "over!");
+        console.log("Move "+ key + " over!");
     }
 
     render() {
         return (
             <div className="board">
                 <h3>Kanban Board</h3>
-                <Column name="To Do" id={0} moveOverTask={this.moveOverTop}/>
-                <Column name="In Progress"id={1} moveOverTask={this.moveOverTop}/>
-                <Column name="Blocked"id={2} moveOverTask={this.moveOverTop}/>
-                <Column name="Completed" id={3} moveOverTask={this.moveOverTop}/>
+                <Column name="To Do" id={0} moveOverTask={this.moveOverTop} items={this.state.data[0]}/>
+                <Column name="In Progress"id={1} moveOverTask={this.moveOverTop} items={this.state.data[1]}/>
+                <Column name="Blocked"id={2} moveOverTask={this.moveOverTop} items={this.state.data[2]}/>
+                <Column name="Completed" id={3} moveOverTask={this.moveOverTop} items={this.state.data[3]}/>
             </div>
         )
     }
@@ -59,7 +60,6 @@ class Column extends Component {
     }
 
     moveOverTask(key){
-        console.log("Click! from the column layer.");
         this.props.moveOverTask(key);
 
     }
@@ -93,12 +93,10 @@ class TaskHolder extends Component {
     }
     
     moveOver(key){
-        console.log("Click! from the holder layer");
         this.props.moveOver(key);
     }
 
     createItems(item) {
-        console.log("Creating thing");
         return <Task entries={item} key={item.key} moveOverBase={this.moveOver}/>
     }
 
@@ -126,7 +124,7 @@ class Task extends Component {
 
     render() {
         return (
-            <div className="square" key={this.state.key} 
+            <div className="square" draggable="true" key={this.state.key} 
             onClick={ () =>this.moveOverBase(this.state.key)}>
                 <p>Name: {this.state.name}</p>
                 <p>Description: {this.state.description}</p>
