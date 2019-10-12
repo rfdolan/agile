@@ -6,7 +6,8 @@ class App extends Component {
   state = {
     data: [],
     id: 0,
-    message: null,
+    messageName: null,
+    messageDesc: null,
     intervalIsSet: false,
     idToDelete: null,
     idToUpdate: null,
@@ -49,16 +50,19 @@ class App extends Component {
 
   // our put method that uses our backend api
   // to create new query into our data base
-  putDataToDB = (message) => {
+  putDataToDB = (messageName, messageDesc) => {
     let currentIds = this.state.data.map((data) => data.id);
     let idToBeAdded = 0;
     while (currentIds.includes(idToBeAdded)) {
       ++idToBeAdded;
     }
 
+    console.log("About to call putData. Name: " + messageName + "Desc: " + messageDesc);
     axios.post('http://localhost:3001/api/putData', {
+
       id: idToBeAdded,
-      message: message,
+      taskName: messageName,
+      description: messageDesc,
     });
   };
 
@@ -67,8 +71,10 @@ class App extends Component {
   deleteFromDB = (idTodelete) => {
     //parseInt(idTodelete);
     let objIdToDelete = null;
+    console.log("Called delete from database");
     this.state.data.forEach((dat) => {
       if (dat.id === parseInt(idTodelete)) {
+        console.log("Found item " + dat.id );
         objIdToDelete = dat._id;
       }
     });
@@ -80,6 +86,7 @@ class App extends Component {
     });
   };
 
+  //TODO fix this to work with new data schema
   // our update method that uses our backend api
   // to overwrite existing data base information
   updateDB = (idToUpdate, updateToApply) => {
@@ -110,22 +117,38 @@ class App extends Component {
             : data.map((dat) => (
                 <li style={{ padding: '10px' }} key={data.message}>
                   <span style={{ color: 'gray' }}> id: </span> {dat.id} <br />
-                  <span style={{ color: 'gray' }}> data: </span>
-                  {dat.message}
+                  <span style={{ color: 'gray' }}> Task Name: </span>
+                  {dat.taskName}<br />
+                  <span style={{ color: 'gray' }}> Description: </span>
+                  {dat.description}<br />
                 </li>
               ))}
         </ul>
+        <div style={{ border: '3px solid black', padding: '10px'}}>
+         <b>Add an element!</b> 
         <div style={{ padding: '10px' }}>
+          <body>Task Name:</body>
           <input
             type="text"
-            onChange={(e) => this.setState({ message: e.target.value })}
-            placeholder="add something in the database"
+            onChange={(e) => this.setState({ messageName: e.target.value })}
+            placeholder="enter taskname"
             style={{ width: '200px' }}
           />
-          <button onClick={() => this.putDataToDB(this.state.message)}>
+          <br />
+          <body>Description:</body>
+          <input
+            type="text"
+            onChange={(e) => this.setState({ messageDesc: e.target.value })}
+            placeholder="enter description"
+            style={{ width: '200px' }}
+          />
+          <button onClick={() => this.putDataToDB(this.state.messageName, this.state.messageDesc)}>
             ADD
           </button>
         </div>
+        </div><br />
+        <div style={{ border: '3px solid black', padding: '10px'}}>
+          <b>Delete an element!</b>
         <div style={{ padding: '10px' }}>
           <input
             type="text"
@@ -136,6 +159,7 @@ class App extends Component {
           <button onClick={() => this.deleteFromDB(this.state.idToDelete)}>
             DELETE
           </button>
+        </div>
         </div>
         <div style={{ padding: '10px' }}>
           <input

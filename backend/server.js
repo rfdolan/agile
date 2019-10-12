@@ -62,17 +62,20 @@ router.delete('/deleteData', (req, res) => {
 // this is our create methid
 // this method adds new data in our database
 router.post('/putData', (req, res) => {
+  console.log("Starting putData");
   let data = new Data();
 
-  const { id, message } = req.body;
+  // These variables here are set when we call post in App.js
+  const { id, taskName, description } = req.body;
 
-  if ((!id && id !== 0) || !message) {
+  if ((!id && id !== 0) || !taskName || !description) {
     return res.json({
       success: false,
       error: 'INVALID INPUTS',
     });
   }
-  data.message = message;
+  data.description = description;
+  data.taskName = taskName;
   data.id = id;
   data.save((err) => {
     if (err) return res.json({ success: false, error: err });
