@@ -39,6 +39,18 @@ router.get('/getData', (req, res) => {
   });
 });
 
+// rfdolan
+// This method takes an object id and returns the specific object we want
+// TODO Make sure this is getting the parameter correctly
+router.get('/getSingleTask', (req, res) => {
+  let id = req.query.taskId;
+  //console.log("Id is " + id);
+  Data.findById(id, (err, data) => {
+    if(err) return res.json({success: false, error: err });
+    return res.json({ success: true, taskInfo: data });
+  });
+});
+
 // this is our update method
 // this method overwrites existing data in our database
 router.post('/updateData', (req, res) => {

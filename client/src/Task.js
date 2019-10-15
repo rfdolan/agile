@@ -1,21 +1,28 @@
-import React, { Component } from 'react';
-import Task from "./Task.js";
-//import axios from 'axios';
 
-class App extends Component {
+import React, { Component } from 'react';
+import axios from 'axios';
+
+class Task extends Component {
+  /*
+  constructor(props) {
+    super(props);
+  }
+  */
   // initialize our state
   state = {
-    data: [],
-    id: 0,
+    id: this.props.mongoObjectId,
+    // These variables are used when putting data into the database
     messageName: null,
     messageDesc: null,
     intervalIsSet: false,
+    
     idToDelete: null,
     idToUpdate: null,
     objectToUpdate: null,
+    // Information is the json that holds all of the task's information
+    information: null,
   };
 
-  /*
   // when component mounts, first thing it does is fetch all existing data in our db
   // then we incorporate a polling logic so that we can easily see if our db has
   // changed and implement those changes into our UI
@@ -41,6 +48,7 @@ class App extends Component {
   // for our back end, we use the object id assigned by MongoDB to modify
   // data base entries
 
+  /*
   // our first get method that uses our backend api to
   // fetch data from our data base
   getDataFromDb = () => {
@@ -48,6 +56,18 @@ class App extends Component {
     fetch('http://localhost:3001/api/getData')
       .then((data) => data.json())
       .then((res) => this.setState({ data: res.data }));
+  };
+  */
+
+  // rfdolan
+  // This function gets the information about our current task
+  getDataFromDb = () => {
+    console.log("Getting object " + this.state.id);
+    axios.get('http://localhost:3001/api/getSingleTask', {
+      params: {
+        taskId: this.state.id
+      }
+    }).then((res) => {this.setState({information: res.data.taskInfo})});
   };
 
   // our put method that uses our backend api
@@ -60,7 +80,7 @@ class App extends Component {
       ++idToBeAdded;
     }
 
-    console.log("About to call putData. Name: " + messageName + "Desc: " + messageDesc);
+    console.log("About to call putData. Name: " + messageName + " Desc: " + messageDesc);
     axios.post('http://localhost:3001/api/putData', {
 
       id: idToBeAdded,
@@ -111,95 +131,24 @@ class App extends Component {
   // it is easy to understand their functions when you
   // see them render into our screen
   render() {
-    const { data } = this.state;
+    //const { information } = this.state;
     return (
+    
       <div>
-        <ul>
-          {data.length <= 0
-            ? 'NO DB ENTRIES YET'
-            : data.map((dat) => (
-                <li style={{ padding: '10px' }} key={data.message}>
-                  <span style={{ color: 'gray' }}> id: </span> {dat.id} <br />
-                  <span style={{ color: 'gray' }}> Task Name: </span>
-                  {dat.taskName}<br />
-                  <span style={{ color: 'gray' }}> Description: </span>
-                  {dat.description}<br />
-                </li>
-              ))}
-        </ul>
-        <div style={{ border: '3px solid black', padding: '10px'}}>
-         <b>Add an element!</b> 
-        <div style={{ padding: '10px' }}>
-          <body>Task Name:</body>
-          <input
-            type="text"
-            onChange={(e) => this.setState({ messageName: e.target.value })}
-            placeholder="enter taskname"
-            style={{ width: '200px' }}
-          />
-          <br />
-          <body>Description:</body>
-          <input
-            type="text"
-            onChange={(e) => this.setState({ messageDesc: e.target.value })}
-            placeholder="enter description"
-            style={{ width: '200px' }}
-          />
-          <button onClick={() => this.putDataToDB(this.state.messageName, this.state.messageDesc)}>
-            ADD
-          </button>
-        </div>
-        </div><br />
-        <div style={{ border: '3px solid black', padding: '10px'}}>
-          <b>Delete an element!</b>
-        <div style={{ padding: '10px' }}>
-          <input
-            type="text"
-            style={{ width: '200px' }}
-            onChange={(e) => this.setState({ idToDelete: e.target.value })}
-            placeholder="put id of item to delete here"
-          />
-          <button onClick={() => this.deleteFromDB(this.state.idToDelete)}>
-            DELETE
-          </button>
-        </div>
-        </div>
-        <div style={{ padding: '10px' }}>
-          <input
-            type="text"
-            style={{ width: '200px' }}
-            onChange={(e) => this.setState({ idToUpdate: e.target.value })}
-            placeholder="id of item to update here"
-          />
-          <input
-            type="text"
-            style={{ width: '200px' }}
-            onChange={(e) => this.setState({ updateToApply: e.target.value })}
-            placeholder="put new value of the item here"
-          />
-          <button
-            onClick={() =>
-              this.updateDB(this.state.idToUpdate, this.state.updateToApply)
-            }
-          >
-            UPDATE
-          </button>
-        </div>
+        <h4>Task with id {this.state.id}</h4>
+          {this.state.information == null
+            ? 'ERROR: MALFORMED ID IN COLUMN'
+            :<div style={{ padding: '10px' }} key={this.state.information.id}>
+                <span style={{ color: 'gray' }}> Task Name: </span>
+                {this.state.information.taskName}<br />
+                <span style={{ color: 'gray' }}> Description: </span>
+                {this.state.information.description}<br />
+              </div>
+          }
+       
       </div>
     );
   }
-  */
- render() {
-   return(
-     <div>
-       <h1>Welcome to the app this text is from the App component</h1>
-       <Task mongoObjectId={"5da13e54172fdf28f481890b"} />
-       <Task mongoObjectId={"5da237b712de25205c5129ff"} />
-       <Task mongoObjectId={"5da2379512de25205c5129fe"} />
-
-     </div>
-   )
- }
 }
 
-export default App;
+export default Task;
