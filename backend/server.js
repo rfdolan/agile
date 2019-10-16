@@ -41,13 +41,12 @@ router.get('/getData', (req, res) => {
 
 // rfdolan
 // This method takes an object id and returns the specific object we want
-// TODO Make sure this is getting the parameter correctly
-router.get('/getSingleTask', (req, res) => {
-  let id = req.query.taskId;
+router.get('/getSingleObject', (req, res) => {
+  let id = req.query.objId;
   //console.log("Id is " + id);
   Data.findById(id, (err, data) => {
-    if(err) return res.json({success: false, error: err });
-    return res.json({ success: true, taskInfo: data });
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true, objectInfo: data });
   });
 });
 

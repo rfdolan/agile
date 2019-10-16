@@ -62,12 +62,12 @@ class Task extends Component {
   // rfdolan
   // This function gets the information about our current task
   getDataFromDb = () => {
-    console.log("Getting object " + this.state.id);
-    axios.get('http://localhost:3001/api/getSingleTask', {
+    //console.log("Getting object " + this.state.id);
+    axios.get('http://localhost:3001/api/getSingleObject', {
       params: {
-        taskId: this.state.id
+        objId: this.state.id
       }
-    }).then((res) => {this.setState({information: res.data.taskInfo})});
+    }).then((res) => {this.setState({information: res.data.objectInfo})});
   };
 
   // our put method that uses our backend api

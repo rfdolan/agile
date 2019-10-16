@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Task from "./Task.js";
+import Board from "./Board.js";
 //import axios from 'axios';
 
 class App extends Component {
@@ -193,9 +193,7 @@ class App extends Component {
    return(
      <div>
        <h1>Welcome to the app this text is from the App component</h1>
-       <Task mongoObjectId={"5da13e54172fdf28f481890b"} />
-       <Task mongoObjectId={"5da237b712de25205c5129ff"} />
-       <Task mongoObjectId={"5da2379512de25205c5129fe"} />
+       <Board id={"5da66b5c1c9d440000565d7f"} />
 
      </div>
    )
