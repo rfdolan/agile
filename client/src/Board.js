@@ -61,7 +61,7 @@ class Board extends Component {
                 <div style={{display:"flex","overflow-x":"scroll",whitespace: "nowrap", border: "5px solid green", padding:"5px"}}>
                     {this.renderColumns()}
                     
-                    <button style={{flex:"none"}}>Create new column</button>
+                    <button style={{flex:"none", height:"20px"}}>Create new column</button>
                 </div>
 
             </div>

@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react';
 import axios from 'axios';
+import EditableElement from './EditableElement.js';
 
 class Task extends Component {
   /*
@@ -109,23 +110,30 @@ class Task extends Component {
     });
   };
 
-  //TODO fix this to work with new data schema
   // our update method that uses our backend api
   // to overwrite existing data base information
-  updateDB = (idToUpdate, updateToApply) => {
-    let objIdToUpdate = null;
+  updateDB = (fieldToUpdate, updateToApply) => {
+    console.log("Updating " + fieldToUpdate + " to be " + updateToApply);
     //parseInt(idToUpdate);
-    this.state.data.forEach((dat) => {
-      if (dat.id === parseInt(idToUpdate)) {
-        objIdToUpdate = dat._id;
-      }
-    });
 
     axios.post('http://localhost:3001/api/updateData', {
-      id: objIdToUpdate,
-      update: { message: updateToApply },
+      id: this.state.id,
+      update: { [fieldToUpdate]: updateToApply },
     });
   };
+
+  renderProperty = (propName, propContent, labelText) => {
+    
+    return<div> 
+        <span style={{ color: 'gray' }}>{labelText}: </span>
+        <EditableElement 
+        elementType="span"
+        content={propContent}
+        updateProp={this.updateDB} 
+        fieldName={propName} 
+        />
+      </div>
+  }
 
   // here is our UI
   // it is easy to understand their functions when you
@@ -134,15 +142,12 @@ class Task extends Component {
     //const { information } = this.state;
     return (
     
-      <div>
-        <h4>Task with id {this.state.id}</h4>
+      <div style={{border:"3px solid black"}}>
           {this.state.information == null
             ? 'ERROR: MALFORMED ID IN COLUMN'
             :<div style={{ padding: '10px' }} key={this.state.information.id}>
-                <span style={{ color: 'gray' }}> Task Name: </span>
-                {this.state.information.taskName}<br />
-                <span style={{ color: 'gray' }}> Description: </span>
-                {this.state.information.description}<br />
+              {this.renderProperty("taskName", this.state.information.taskName, "Task Name")}
+              {this.renderProperty("description", this.state.information.description, "Description")}
               </div>
           }
        

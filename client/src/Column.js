@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import Task from "./Task.js";
+import EditableElement from "./EditableElement";
 import axios from 'axios';
 
 class Column extends Component {
     state = {
         id: this.props.id,
-        name: null,
+        information: null,
         taskIds: [],
         intervalIsSet: false,
 
@@ -31,9 +32,31 @@ class Column extends Component {
         }
     }
 
+  updateDB = (fieldToUpdate, updateToApply) => {
+    console.log("Updating " + fieldToUpdate + " to be " + updateToApply);
+    //parseInt(idToUpdate);
+
+    axios.post('http://localhost:3001/api/updateData', {
+      id: this.state.id,
+      update: { [fieldToUpdate]: updateToApply },
+    });
+  };
+
+  // TODO Fix problem where this doesn't update
+  renderName = (propName, propContent) =>{
+    
+    return<div> 
+        <EditableElement 
+        elementType="h3"
+        content={propContent}
+        updateProp={this.updateDB} 
+        fieldName={propName} 
+        />
+      </div>
+  }
     // rfdolan
     // Function to render the tasks in a column based off of their ids
-    renderTasks() {
+    renderTasks = () => {
         let tasks = [];
         for (let i = 0; i < this.state.taskIds.length; i++) {
             tasks.push(<Task mongoObjectId={this.state.taskIds[i]} />);
@@ -47,16 +70,21 @@ class Column extends Component {
             params: {
                 objId: this.state.id
             }
-        }).then((res) => { this.setState({ taskIds: res.data.objectInfo.taskIds }) });
+        }).then((res) => { this.setState({ taskIds: res.data.objectInfo.taskIds, information: res.data.objectInfo }) });
     };
 
     // TODO add button functionality to add a task
     render() {
         return (
             <div style={{ display: "inline-block", border: "5px solid red", padding: "5px", margin: "5px" }}>
-                <h3>Hello this is a column</h3>
-                {this.renderTasks()}
-                <button>Add task</button>
+                {this.state.information == null 
+                    ? 'ERROR: MALFORMED ID IN BOARD'
+                    :<div> 
+                        {this.renderName("name", this.state.information.name)}
+                        {this.renderTasks()}
+                        <button>Add task</button>
+                    </div>
+                }
 
             </div>
         )
