@@ -32,57 +32,78 @@ class Column extends Component {
         }
     }
 
-  updateDB = (fieldToUpdate, updateToApply) => {
-    console.log("Updating " + fieldToUpdate + " to be " + updateToApply);
-    //parseInt(idToUpdate);
+    updateDB = (fieldToUpdate, updateToApply) => {
+        console.log("Updating " + fieldToUpdate + " to be " + updateToApply + " on id " + this.state.id);
+        //parseInt(idToUpdate);
 
-    axios.post('http://localhost:3001/api/updateData', {
-      id: this.state.id,
-      update: { [fieldToUpdate]: updateToApply },
-    });
-  };
+        axios.post('http://localhost:3001/api/updateColumn', {
+            id: this.state.id,
+            update: { [fieldToUpdate]: updateToApply },
+        });
+    };
 
-  // TODO Fix problem where this doesn't update
-  renderName = (propName, propContent) =>{
-    
-    return<div> 
-        <EditableElement 
-        elementType="h3"
-        content={propContent}
-        updateProp={this.updateDB} 
-        fieldName={propName} 
-        />
-      </div>
-  }
+    // TODO Fix problem where this doesn't update
+    renderName = (propName, propContent) => {
+
+        return <div>
+            <EditableElement
+                elementType="h2"
+                content={propContent}
+                updateProp={this.updateDB}
+                fieldName={propName}
+            />
+        </div>
+    }
+
     // rfdolan
     // Function to render the tasks in a column based off of their ids
     renderTasks = () => {
         let tasks = [];
         for (let i = 0; i < this.state.taskIds.length; i++) {
-            tasks.push(<Task mongoObjectId={this.state.taskIds[i]} />);
+            tasks.push(<><Task mongoObjectId={this.state.taskIds[i]} /><br /></>);
         }
         return tasks;
     }
 
     getColumnFromDb = () => {
         //console.log("Getting Column " + this.state.id);
-        axios.get('http://localhost:3001/api/getSingleObject', {
+        axios.get('http://localhost:3001/api/getColumn', {
             params: {
                 objId: this.state.id
             }
         }).then((res) => { this.setState({ taskIds: res.data.objectInfo.taskIds, information: res.data.objectInfo }) });
     };
 
+    putNewTaskToDb = () => {
+        //console.log("Putting new column");
+        axios.post('http://localhost:3001/api/putEmptyTask')
+            .then((res) => {
+                console.log(res);
+                this.addTaskToColumn(res.data.objectInfo._id)
+            });
+    };
+
+    addTaskToColumn = (newTaskId) => {
+        console.log(newTaskId);
+
+        axios.post('http://localhost:3001/api/updateColumn', {
+            id: this.state.id,
+            update: { $push: { taskIds: newTaskId } },
+
+        });
+
+    };
+
     // TODO add button functionality to add a task
     render() {
         return (
-            <div style={{ display: "inline-block", border: "5px solid red", padding: "5px", margin: "5px" }}>
-                {this.state.information == null 
+            <div style={{ display: "inline-block", border: "5px solid red", padding: "5px", margin: "5px", width: "20%" }}>
+                {this.state.information == null
                     ? 'ERROR: MALFORMED ID IN BOARD'
-                    :<div> 
+                    : <div>
                         {this.renderName("name", this.state.information.name)}
                         {this.renderTasks()}
-                        <button>Add task</button>
+                        <button onClick={this.putNewTaskToDb}>Add task</button>
                     </div>
                 }
 

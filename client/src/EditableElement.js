@@ -28,7 +28,7 @@ class EditableElement extends Component {
         <input type='text'
           className='editing' 
           defaultValue={this.state.content}
-          ref="textInput" 
+          ref='textInput' 
           /> 
           <button onClick={this.toggleEdit}>X</button>
           <button onClick={this.updateValue}>OK</button>

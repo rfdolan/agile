@@ -16,7 +16,7 @@ class Task extends Component {
     messageName: null,
     messageDesc: null,
     intervalIsSet: false,
-    
+
     idToDelete: null,
     idToUpdate: null,
     objectToUpdate: null,
@@ -64,11 +64,11 @@ class Task extends Component {
   // This function gets the information about our current task
   getDataFromDb = () => {
     //console.log("Getting object " + this.state.id);
-    axios.get('http://localhost:3001/api/getSingleObject', {
+    axios.get('http://localhost:3001/api/getTask', {
       params: {
         objId: this.state.id
       }
-    }).then((res) => {this.setState({information: res.data.objectInfo})});
+    }).then((res) => { this.setState({ information: res.data.objectInfo }) });
   };
 
   // our put method that uses our backend api
@@ -98,7 +98,7 @@ class Task extends Component {
     console.log("Called delete from database");
     this.state.data.forEach((dat) => {
       if (dat.id === parseInt(idTodelete)) {
-        console.log("Found item " + dat.id );
+        console.log("Found item " + dat.id);
         objIdToDelete = dat._id;
       }
     });
@@ -116,23 +116,23 @@ class Task extends Component {
     console.log("Updating " + fieldToUpdate + " to be " + updateToApply);
     //parseInt(idToUpdate);
 
-    axios.post('http://localhost:3001/api/updateData', {
+    axios.post('http://localhost:3001/api/updateTask', {
       id: this.state.id,
       update: { [fieldToUpdate]: updateToApply },
     });
   };
 
   renderProperty = (propName, propContent, labelText) => {
-    
-    return<div> 
-        <span style={{ color: 'gray' }}>{labelText}: </span>
-        <EditableElement 
+
+    return <div>
+      <span style={{ color: 'gray' }}>{labelText}: </span>
+      <EditableElement
         elementType="span"
         content={propContent}
-        updateProp={this.updateDB} 
-        fieldName={propName} 
-        />
-      </div>
+        updateProp={this.updateDB}
+        fieldName={propName}
+      />
+    </div>
   }
 
   // here is our UI
@@ -141,16 +141,16 @@ class Task extends Component {
   render() {
     //const { information } = this.state;
     return (
-    
-      <div style={{border:"3px solid black"}}>
-          {this.state.information == null
-            ? 'ERROR: MALFORMED ID IN COLUMN'
-            :<div style={{ padding: '10px' }} key={this.state.information.id}>
-              {this.renderProperty("taskName", this.state.information.taskName, "Task Name")}
-              {this.renderProperty("description", this.state.information.description, "Description")}
-              </div>
-          }
-       
+
+      <div style={{ border: "3px solid black" }}>
+        {this.state.information == null
+          ? 'ERROR: MALFORMED ID IN COLUMN'
+          : <div style={{ padding: '10px' }} key={this.state.information.id}>
+            {this.renderProperty("taskName", this.state.information.taskName, "Task Name")}
+            {this.renderProperty("description", this.state.information.description, "Description")}
+          </div>
+        }
+
       </div>
     );
   }

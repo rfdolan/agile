@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Board from "./Board.js";
+import axios from 'axios';
 //import axios from 'axios';
 
 class App extends Component {
@@ -13,6 +14,7 @@ class App extends Component {
     idToDelete: null,
     idToUpdate: null,
     objectToUpdate: null,
+    boardId: '5dad35131c9d440000c9677e',
   };
 
   /*
@@ -189,15 +191,50 @@ class App extends Component {
     );
   }
   */
- render() {
-   return(
-     <div>
-       <h1>Welcome to the app this text is from the App component</h1>
-       <Board id={"5da66b5c1c9d440000565d7f"} />
+  createBoard = () => {
 
-     </div>
-   )
- }
+
+  }
+
+  findBoard = () => {
+    let name = this.refs.boardName.value;
+
+    axios.get('http://localhost:3001/api/getBoard', {
+      params: {
+        name: name
+      }
+    })
+    .then((res) => { this.setState({ boardId: res.data.objectInfo._id})})
+    .then(this.renderBoard())
+  }
+
+  renderWelcomeScreen = () => {
+    return <div>
+
+      <h1>Welcome to A. G. I. L. E.</h1>
+
+      <button onClick={this.createBoard()}>Create new board</button><br />
+      <input type='text' ref='boardName' /><button onClick={this.findBoard()}>Search for existing board</button>
+    </div>
+  }
+
+  renderBoard = () => {
+    return <div>
+      <Board id={this.state.boardId} />;
+      </div>
+  }
+
+  render() {
+    return (
+      <div>
+        {this.state.boardId == null
+          ? this.renderWelcomeScreen()
+          : this.renderBoard()
+        }
+
+      </div>
+    )
+  }
 }
 
 export default App;

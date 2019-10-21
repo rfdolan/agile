@@ -4,6 +4,9 @@ var cors = require('cors');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
 const Data = require('./data');
+const Task = require('./task');
+const Column = require('./column');
+const Board = require('./board');
 
 const API_PORT = 3001;
 const app = express();
@@ -39,27 +42,109 @@ router.get('/getData', (req, res) => {
   });
 });
 
+// GET METHODS
 // rfdolan
 // This method takes an object id and returns the specific object we want
-router.get('/getSingleObject', (req, res) => {
+router.get('/getTask', (req, res) => {
   let id = req.query.objId;
   //console.log("Id is " + id);
-  Data.findById(id, (err, data) => {
+  Task.findById(id, (err, data) => {
     if (err) return res.json({ success: false, error: err });
     return res.json({ success: true, objectInfo: data });
   });
 });
 
+router.get('/getColumn', (req, res) => {
+  let id = req.query.objId;
+  //console.log("Id is " + id);
+  Column.findById(id, (err, data) => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true, objectInfo: data });
+  });
+});
+
+router.get('/getBoard', (req, res) => {
+  let name = req.query.name;
+  //console.log("Id is " + id);
+  Board.findOne({ "name": name}, (err, data) => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true, objectInfo: data });
+  });
+});
+
+// UPDATE METHODS
 // this is our update method
 // this method overwrites existing data in our database
-router.post('/updateData', (req, res) => {
+router.post('/updateTask', (req, res) => {
   const { id, update } = req.body;
   console.log("CALLING UPDATE on " + id);
   console.log(update);
-  Data.findByIdAndUpdate(id, update, (err) => {
+  Task.findByIdAndUpdate(id, update, (err) => {
     if (err) return res.json({ success: false, error: err });
     return res.json({ success: true });
   });
+});
+
+router.post('/updateColumn', (req, res) => {
+  const { id, update } = req.body;
+  console.log("CALLING UPDATE on " + id);
+  console.log(update);
+  Column.findByIdAndUpdate(id, update, (err) => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true });
+  });
+});
+
+router.post('/updateBoard', (req, res) => {
+  const { id, update } = req.body;
+  console.log("CALLING UPDATE on " + id);
+  console.log(update);
+  Board.findByIdAndUpdate(id, update, (err) => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true });
+  });
+});
+
+// CREATE METHODS
+// this is our create methid
+// this method adds new data in our database
+router.post('/putEmptyTask', (req, res) => {
+  console.log("Starting putData");
+  let task = new Task();
+
+ 
+  task.description = "description";
+  task.taskName = "name";
+  task.save((err) => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true, objectInfo: task });
+  });
+});
+
+router.post('/putEmptyColumn', (req, res) => {
+  console.log("Calling putEmptyColumn");
+  let column = new Column();
+
+  column.name = "New Column";
+  column.taskIds = [];
+  column.save((err) => {
+    if(err) return res.json({ success: false, error: err });
+    return res.json({ success: true, objectInfo: column });
+  });
+
+});
+
+router.post('/putEmptyBoard', (req, res) => {
+  console.log("Calling putEmptyColumn");
+  let board = new Board();
+
+  board.name = "New Column";
+  board.taskIds = [];
+  board.save((err) => {
+    if(err) return res.json({ success: false, error: err });
+    return res.json({ success: true, objectInfo: board });
+  });
+
 });
 
 // this is our delete method
@@ -72,29 +157,8 @@ router.delete('/deleteData', (req, res) => {
   });
 });
 
-// this is our create methid
-// this method adds new data in our database
-router.post('/putData', (req, res) => {
-  console.log("Starting putData");
-  let data = new Data();
 
-  // These variables here are set when we call post in App.js
-  const { id, taskName, description } = req.body;
 
-  if ((!id && id !== 0) || !taskName || !description) {
-    return res.json({
-      success: false,
-      error: 'INVALID INPUTS',
-    });
-  }
-  data.description = description;
-  data.taskName = taskName;
-  data.id = id;
-  data.save((err) => {
-    if (err) return res.json({ success: false, error: err });
-    return res.json({ success: true });
-  });
-});
 
 // append /api for our http requests
 // This makes it so that we can use router instead of app in this file, so everything in here is part of the API
