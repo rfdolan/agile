@@ -10,9 +10,11 @@ class EditableElement extends Component {
     }
 
     toggleEdit = () => {
-      this.setState({
-        editing: !this.state.editing
-      })
+      if(this.state.content != null){
+        this.setState({
+          editing: !this.state.editing
+        })
+      }
     }
 
     updateValue = () => {
@@ -43,7 +45,8 @@ class EditableElement extends Component {
           ref={(domNode) => {this.domElm = domNode;}}
           onBlur={this.save}
           onKeyDown={this.handleKeyDown}
-          {...this.props}>
+          {...this.props}
+          style={{wordWrap:"break-word"}}>
           {this.state.content}
            </this.state.elementType>
     }

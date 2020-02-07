@@ -157,6 +157,14 @@ router.delete('/deleteData', (req, res) => {
   });
 });
 
+router.post('/deleteColumn', (req, res) => {
+  console.log("In delete function");
+  const {id} = req.body;
+  Column.findByIdAndRemove(id, (err) => {
+    if(err) return res.send(err);
+    return res.json({success:true});
+  });
+});
 
 
 

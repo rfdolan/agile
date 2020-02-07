@@ -220,7 +220,7 @@ class App extends Component {
 
   renderBoard = () => {
     return <div>
-      <Board id={this.state.boardId} />;
+      <Board id={this.state.boardId} />
       </div>
   }
 

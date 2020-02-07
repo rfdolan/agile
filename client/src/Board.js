@@ -80,6 +80,7 @@ class Board extends Component {
                 content={propContent}
                 updateProp={this.updateDB}
                 fieldName={propName}
+                sytle={{display:"flex", overflowX:"wrap", width:"250px"}}
                 />
         </div>
     }
@@ -91,7 +92,7 @@ class Board extends Component {
         return (
             <div>
                 <h2>Hello this is a board</h2>
-                <div style={{ display: "flex", "overflow-x": "scroll", whitespace: "nowrap", border: "5px solid green", padding: "5px" }}>
+                <div style={{ display:"inline-flex" }}>
                     {this.renderColumns()}
 
                     <button style={{ flex: "none", height: "20px" }} onClick={this.putNewColumnToDb}>Create new column</button>

@@ -42,7 +42,6 @@ class Column extends Component {
         });
     };
 
-    // TODO Fix problem where this doesn't update
     renderName = (propName, propContent) => {
 
         return <div>
@@ -94,10 +93,20 @@ class Column extends Component {
 
     };
 
+    deleteColumnFromDb = () => {
+        console.log("deleting column " + this.state.id);
+        axios.post('http://localhost:3001/api/deleteColumn', {
+            id: this.state.id,
+            
+        }).then((res) => {console.log(res)} )
+    }
+
     // TODO add button functionality to add a task
     render() {
         return (
-            <div style={{ display: "inline-block", border: "5px solid red", padding: "5px", margin: "5px", width: "20%" }}>
+            
+            <div style={{ width:"250px", height:"500px", padding:"10px"}}>
+                <button onClick={this.deleteColumnFromDb}>Delete Column</button>
                 {this.state.information == null
                     ? 'ERROR: MALFORMED ID IN BOARD'
                     : <div>
