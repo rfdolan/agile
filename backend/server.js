@@ -1,3 +1,82 @@
+var express = require('express');
+const logger = require('morgan');
+const bodyParser = require('body-parser');
+var cors = require('cors');
+var app = express();
+const API_PORT = 3001;
+app.use(cors());
+const router = express.Router();
+var sql = require("mysql");
+
+var pool = sql.createPool({
+    connectionLimit: 10,
+    user: 'root',
+    password: 'raymond',
+    host: 'localhost',
+    database: 'agile'
+});
+/*
+// GET METHODS
+// rfdolan
+// This method takes an object id and returns the specific object we want
+router.get('/getTask', (req, res) => {
+  let id = req.query.objId;
+  //console.log("Id is " + id);
+  Task.findById(id, (err, data) => {
+    if (err) return res.json({ success: false, error: err });
+    return res.json({ success: true, objectInfo: data });
+  });
+});
+*/
+
+/*
+* GET BOARD
+* Takes a board id
+* Returns the columns of the board
+*/
+router.post('/getBoard', (req, res) => {
+  // Connect to the database
+  pool.getConnection((err, connection) => {
+    if(err) {console.log(err);}
+    // Query
+    //console.log(req.query)
+    connection.query("SELECT * FROM boards WHERE board_id = ?",[
+      req.query.id
+    ], (err, result) => {
+      if(err) throw(err);
+      //console.log(result);
+      if(result.length === 0) return res.json({ success: false, statusCode: 400 });
+      return res.json({ success: true, statusCode: 200, board: result[0] });
+    })
+  })
+});
+
+router.post('/createBoard', (req, res) => {
+  // Connect to the database
+  pool.getConnection((err, connection) => {
+    if(err) {console.log(err);}
+    // Query
+    //console.log(req.query)
+    connection.query("INSERT INTO boards (name) VALUES (?)",[
+      req.query.name
+    ], (err, result) => {
+      if(err) throw(err);
+      //console.log(result);
+      return res.json({ success: true, statusCode: 200 });
+    })
+  })
+});
+
+
+// append /api for our http requests
+// This makes it so that we can use router instead of app in this file, so everything in here is part of the API
+app.use('/api', router);
+
+// launch our backend into a port
+app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
+
+/*
+LEGACY FOR MONGODB
 const mongoose = require('mongoose');
 const express = require('express');
 var cors = require('cors');
@@ -174,3 +253,4 @@ app.use('/api', router);
 
 // launch our backend into a port
 app.listen(API_PORT, () => console.log(`LISTENING ON PORT ${API_PORT}`));
+*/
