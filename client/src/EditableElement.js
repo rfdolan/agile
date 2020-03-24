@@ -6,7 +6,7 @@ class EditableElement extends Component {
         editing: false,
         content: this.props.content,
         fieldName: this.props.fieldName,
-        elementType: this.props.elementType,
+        elementtype: this.props.elementType,
     }
 
     toggleEdit = () => {
@@ -26,7 +26,7 @@ class EditableElement extends Component {
     }
 
     renderEditView = () => {
-      return <this.state.elementType>
+      return <this.state.elementtype>
         <input type='text'
           className='editing' 
           defaultValue={this.state.content}
@@ -34,21 +34,20 @@ class EditableElement extends Component {
           /> 
           <button onClick={this.toggleEdit}>X</button>
           <button onClick={this.updateValue}>OK</button>
-          </this.state.elementType>
+          </this.state.elementtype>
     }
     
     renderNormalView = () => {
 
-      return <this.state.elementType
+      return <this.state.elementtype
           onDoubleClick={this.toggleEdit} 
           contentEditable={this.editing}
           ref={(domNode) => {this.domElm = domNode;}}
           onBlur={this.save}
           onKeyDown={this.handleKeyDown}
-          {...this.props}
           style={{wordWrap:"break-word"}}>
           {this.state.content}
-           </this.state.elementType>
+           </this.state.elementtype>
     }
 
       render() {

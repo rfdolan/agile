@@ -1,23 +1,28 @@
 
 import React, { Component } from 'react';
 import Column from "./Column.js";
-import axios from 'axios';
 import EditableElement from './EditableElement.js';
+import base_url from './api'
+
+const get_columns_url = base_url + 'getBoardColumns'
+const create_column_url = base_url + 'createColumn'
 
 class Board extends Component {
     state = {
         id: this.props.id,
-        name: null,
-        columnIds: [],
+        name: this.props.name,
+        createdAt: this.props.createdAt,
+        columns: [],
         intervalIsSet: false,
-
+        loadedColumns: false,
+        newColumnName: ''
     }
 
     // when component mounts, first thing it does is fetch all existing data in our db
     // then we incorporate a polling logic so that we can easily see if our db has
     // changed and implement those changes into our UI
     componentDidMount() {
-        this.getBoardFromDb();
+        this.getColumns();
         if (!this.state.intervalIsSet) {
             let interval = setInterval(this.getBoardFromDb, 1000);
             this.setState({ intervalIsSet: interval });
@@ -38,40 +43,68 @@ class Board extends Component {
     renderColumns() {
         //console.log(this.state.columnIds)
         let columns = [];
-        for (let i = 0; i < this.state.columnIds.length; i++) {
-            columns.push(<Column id={this.state.columnIds[i]} />);
+        for (let i = 0; i < this.state.columns.length; i++) {
+            let curr = this.state.columns[i]
+            columns.push(<Column id={curr.column_id} name={curr.name} key={curr.column_id}
+                deleteCallback={this.getColumns} />);
         }
         return columns;
     }
 
-    getBoardFromDb = () => {
-        //console.log("Getting object " + this.state.id);
-        axios.get('http://localhost:3001/api/getBoard', {
-            params: {
-                objId: this.state.id
+    // Gets columns for this board
+    getColumns = (e) => {
+        let boardId = encodeURIComponent(this.state.id)
+        fetch(get_columns_url + `?id=${boardId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'applications/json'
             }
-        }).then((res) => { this.setState({ columnIds: res.data.objectInfo.columnIds }) });
+        })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    //console.log(result)
+                    let status = result.statusCode
+                    if (status === 200) {
+                        let cols = result.columns
+                        //console.log(cols)
+                        this.setState({
+                            columns: cols,
+                            loadedColumns: true
+                        })
+                    } else {
+                        console.log("Error getting columns")
+                    }
+                }
+            );
     };
 
-    putNewColumnToDb = () => {
-        //console.log("Putting new column");
-        axios.post('http://localhost:3001/api/putEmptyColumn')
-            .then((res) => {
-                console.log(res);
-                this.addColumnToBoard(res.data.objectInfo._id)
-            });
-    };
-
-    addColumnToBoard = (newColumnId) => {
-        console.log(newColumnId);
-
-        axios.post('http://localhost:3001/api/updateBoard', {
-            id: this.state.id,
-            update: { $push: { columnIds: newColumnId } },
-
-        });
-
-    };
+    createNewColumn = (e) => {
+        if (this.state.newColumnName === '') { return; }
+        let newName = encodeURIComponent(this.state.newColumnName)
+        let boardId = encodeURIComponent(this.state.id)
+        fetch(create_column_url + `?name=${newName}&id=${boardId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'applications/json'
+            }
+        })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    //console.log(result)
+                    let status = result.statusCode
+                    if (status === 200) {
+                        this.setState({
+                            columns: result.columns,
+                            newColumnName: ''
+                        })
+                    } else {
+                        console.log("Error creating task")
+                    }
+                }
+            );
+    }
 
     renderName = (propName, propContent) => {
         return <div>
@@ -80,22 +113,31 @@ class Board extends Component {
                 content={propContent}
                 updateProp={this.updateDB}
                 fieldName={propName}
-                sytle={{display:"flex", overflowX:"wrap", width:"250px"}}
-                />
+                sytle={{ display: "flex", overflowX: "wrap", width: "250px" }}
+            />
         </div>
     }
 
+    handleChange = (e) => {
+        this.setState({
+            [e.target.name]: e.target.value
+        })
+    }
 
     // TODO move all style to a stylesheet
-    // TODO add button functionality to add a column
     render() {
         return (
             <div>
-                <h2>Hello this is a board</h2>
-                <div style={{ display:"inline-flex" }}>
-                    {this.renderColumns()}
+                <h2>{this.state.name}</h2>
 
-                    <button style={{ flex: "none", height: "20px" }} onClick={this.putNewColumnToDb}>Create new column</button>
+                <div style={{ display: "inline-flex" }}>
+                    {this.state.loadedColumns ? this.renderColumns() : ''}
+
+                    <label>New Column Name:
+                    <input name="newColumnName" value={this.state.newColumnName}
+                            onChange={e => this.handleChange(e)}></input>
+                    </label>
+                    <button type="button" style={{ height: '25px' }} onClick={(e) => this.createNewColumn(e)}>Create New Column</button>
                 </div>
 
             </div>

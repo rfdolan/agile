@@ -2,7 +2,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import EditableElement from './EditableElement.js';
+import base_url from './api'
 
+const delete_url = base_url + 'deleteTask'
 class Task extends Component {
   /*
   constructor(props) {
@@ -11,10 +13,10 @@ class Task extends Component {
   */
   // initialize our state
   state = {
-    id: this.props.mongoObjectId,
+    id: this.props.id,
     // These variables are used when putting data into the database
-    messageName: null,
-    messageDesc: null,
+    name: this.props.name,
+    description: this.props.description,
     intervalIsSet: false,
 
     idToDelete: null,
@@ -28,7 +30,6 @@ class Task extends Component {
   // then we incorporate a polling logic so that we can easily see if our db has
   // changed and implement those changes into our UI
   componentDidMount() {
-    this.getDataFromDb();
     if (!this.state.intervalIsSet) {
       let interval = setInterval(this.getDataFromDb, 1000);
       this.setState({ intervalIsSet: interval });
@@ -44,74 +45,34 @@ class Task extends Component {
     }
   }
 
-  // just a note, here, in the front end, we use the id key of our data object
-  // in order to identify which we want to Update or delete.
-  // for our back end, we use the object id assigned by MongoDB to modify
-  // data base entries
-
-  /*
-  // our first get method that uses our backend api to
-  // fetch data from our data base
-  getDataFromDb = () => {
-    console.log("Getting data from database");
-    fetch('http://localhost:3001/api/getData')
-      .then((data) => data.json())
-      .then((res) => this.setState({ data: res.data }));
-  };
-  */
-
-  // rfdolan
-  // This function gets the information about our current task
-  getDataFromDb = () => {
-    //console.log("Getting object " + this.state.id);
-    axios.get('http://localhost:3001/api/getTask', {
-      params: {
-        objId: this.state.id
-      }
-    }).then((res) => { this.setState({ information: res.data.objectInfo }) });
-  };
-
-  // our put method that uses our backend api
-  // to create new query into our data base
-  putDataToDB = (messageName, messageDesc) => {
-    // This map call makes it so that the data array in state gets filled with ids from the data object.
-    let currentIds = this.state.data.map((data) => data.id);
-    let idToBeAdded = 0;
-    while (currentIds.includes(idToBeAdded)) {
-      ++idToBeAdded;
+  deleteTask = (e) => {
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      let taskId = encodeURIComponent(this.state.id)
+      fetch(delete_url + `?id=${taskId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'applications/json'
+        }
+      })
+        .then(res => res.json())
+        .then(
+          (result) => {
+            console.log(result)
+            let status = result.statusCode
+            if (status === 200) {
+              console.log("Calling callback")
+              this.props.deleteCallback()
+            } else {
+              console.log("Error deleting task")
+            }
+          }
+        );
     }
-
-    console.log("About to call putData. Name: " + messageName + " Desc: " + messageDesc);
-    axios.post('http://localhost:3001/api/putData', {
-
-      id: idToBeAdded,
-      taskName: messageName,
-      description: messageDesc,
-    });
-  };
-
-  // our delete method that uses our backend api
-  // to remove existing database information
-  deleteFromDB = (idTodelete) => {
-    //parseInt(idTodelete);
-    let objIdToDelete = null;
-    console.log("Called delete from database");
-    this.state.data.forEach((dat) => {
-      if (dat.id === parseInt(idTodelete)) {
-        console.log("Found item " + dat.id);
-        objIdToDelete = dat._id;
-      }
-    });
-
-    axios.delete('http://localhost:3001/api/deleteData', {
-      data: {
-        id: objIdToDelete,
-      },
-    });
-  };
+  }
 
   // our update method that uses our backend api
   // to overwrite existing data base information
+  //TODO rewrite
   updateDB = (fieldToUpdate, updateToApply) => {
     console.log("Updating " + fieldToUpdate + " to be " + updateToApply);
     //parseInt(idToUpdate);
@@ -135,21 +96,16 @@ class Task extends Component {
     </div>
   }
 
-  // here is our UI
-  // it is easy to understand their functions when you
-  // see them render into our screen
   render() {
     //const { information } = this.state;
     return (
 
       <div style={{ border: "3px solid black" }}>
-        {this.state.information == null
-          ? 'ERROR: MALFORMED ID IN COLUMN'
-          : <div style={{ padding: '10px' }} key={this.state.information.id}>
-            {this.renderProperty("taskName", this.state.information.taskName, "Task Name")}
-            {this.renderProperty("description", this.state.information.description, "Description")}
-          </div>
-        }
+        <button type="button" onClick={(e) => this.deleteTask(e)}>Delete</button>
+        <div>
+          {this.renderProperty("taskName", this.state.name, "Task Name")}
+          {this.renderProperty("description", this.state.description, "Description")}
+        </div>
 
       </div>
     );
