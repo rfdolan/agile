@@ -13,7 +13,8 @@ var pool = sql.createPool({
     user: 'root',
     password: 'raymond',
     host: 'localhost',
-    database: 'agile'
+    database: 'agile',
+    multipleStatements: true
 });
 /*
 // GET METHODS
@@ -51,6 +52,11 @@ router.post('/getBoard', (req, res) => {
   })
 });
 
+/*
+* CREATE BOARD
+* Takes a name for the new board
+* Returns nothing
+*/
 router.post('/createBoard', (req, res) => {
   // Connect to the database
   pool.getConnection((err, connection) => {
@@ -63,6 +69,139 @@ router.post('/createBoard', (req, res) => {
       if(err) throw(err);
       //console.log(result);
       return res.json({ success: true, statusCode: 200 });
+    })
+  })
+});
+
+/*
+* CREATE COLUMN
+* Takes a name for the new column
+* Returns nothing
+*/
+router.post('/createColumn', (req, res) => {
+  // Connect to the database
+  pool.getConnection((err, connection) => {
+    if(err) {console.log(err);}
+    // Query
+    //console.log(req.query)
+    connection.query("INSERT INTO columns (name, board_id) VALUES (?, ?); " 
+    + "SELECT * FROM columns WHERE board_id = ?;",[
+      req.query.name,
+      req.query.id,
+      req.query.id
+    ], (err, result) => {
+      if(err) throw(err);
+      //console.log(result);
+      return res.json({ success: true, statusCode: 200, columns: result[1] });
+    })
+  })
+});
+
+/*
+* CREATE TASK
+* Takes a name for the new task and column id to add to
+* Returns nothing
+*/
+router.post('/createTask', (req, res) => {
+  // Connect to the database
+  pool.getConnection((err, connection) => {
+    if(err) {console.log(err);}
+    // Query
+    //console.log(req.query)
+    connection.query("INSERT INTO tasks (name, column_id) VALUES (?, ?); "
+    + "SELECT * FROM tasks WHERE column_id = ?;",[
+      req.query.name,
+      req.query.id,
+      req.query.id
+    ], (err, result) => {
+      if(err) throw(err);
+      //console.log(result);
+      return res.json({ success: true, statusCode: 200, tasks: result[1] });
+    })
+  })
+});
+
+/*
+* DELETE COLUMN
+* Takes id of column to be deleted
+* Returns nothing
+*/
+router.post('/deleteColumn', (req, res) => {
+  // Connect to the database
+  pool.getConnection((err, connection) => {
+    if(err) {console.log(err);}
+    // Query
+    console.log(req.query)
+    connection.query("DELETE FROM columns WHERE column_id = ?",[
+      req.query.id
+    ], (err, result) => {
+      if(err) throw(err);
+      //console.log(result);
+      return res.json({ success: true, statusCode: 200});
+    })
+  })
+});
+
+
+/*
+* DELETE TASK
+* Takes id of task to be deleted
+* Returns nothing
+*/
+router.post('/deleteTask', (req, res) => {
+  // Connect to the database
+  pool.getConnection((err, connection) => {
+    if(err) {console.log(err);}
+    // Query
+    console.log(req.query)
+    connection.query("DELETE FROM tasks WHERE task_id = ?",[
+      req.query.id
+    ], (err, result) => {
+      if(err) throw(err);
+      //console.log(result);
+      return res.json({ success: true, statusCode: 200});
+    })
+  })
+});
+
+/*
+* GET BOARD COLUMNS
+* Takes a board id
+* Returns a list of columns
+*/
+router.post('/getBoardColumns', (req, res) => {
+  // Connect to the database
+  pool.getConnection((err, connection) => {
+    if(err) {console.log(err);}
+    // Query
+    console.log(req.query)
+    connection.query("SELECT * FROM columns WHERE board_id = ?",[
+      req.query.id
+    ], (err, result) => {
+      if(err) throw(err);
+      //console.log(result);
+      return res.json({ success: true, statusCode: 200, columns: result });
+    })
+  })
+});
+
+/*
+* GET COLUMN TASKS
+* Takes a column id
+* Returns a list of tasks
+*/
+router.post('/getColumnTasks', (req, res) => {
+  // Connect to the database
+  pool.getConnection((err, connection) => {
+    if(err) {console.log(err);}
+    // Query
+    //console.log(req.query)
+    connection.query("SELECT * FROM tasks WHERE column_id = ?",[
+      req.query.id
+    ], (err, result) => {
+      if(err) throw(err);
+      //console.log(result);
+      return res.json({ success: true, statusCode: 200, tasks: result });
     })
   })
 });
